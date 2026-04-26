@@ -21,31 +21,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // 1. Sync user profile to Firestore
-        const userRef = doc(db, 'users', user.uid);
-        await setDoc(userRef, {
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          updatedAt: serverTimestamp(),
-          createdAt: serverTimestamp(),
-        }, { merge: true });
+      try {
+        if (user) {
+          // 1. Sync user profile to Firestore - non-blocking for Auth state
+          const syncProfile = async () => {
+            try {
+              const userRef = doc(db, 'users', user.uid);
+              await setDoc(userRef, {
+                email: user.email,
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+                updatedAt: serverTimestamp(),
+                createdAt: serverTimestamp(),
+              }, { merge: true });
+            } catch (error) {
+              console.error("Profile sync failed:", error);
+            }
+          };
+          syncProfile();
 
-        // 2. Check if admin
-        try {
-          const { getDoc } = await import('firebase/firestore');
-          const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-          setIsAdmin(adminDoc.exists());
-        } catch (e) {
-          console.log("Admin check failed - likely insufficient permissions (expected if not admin)");
+          // 2. Check if admin
+          try {
+            const { getDoc } = await import('firebase/firestore');
+            const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+            setIsAdmin(adminDoc.exists());
+          } catch (e) {
+            console.log("Admin check failed - expected if not admin");
+            setIsAdmin(false);
+          }
+        } else {
           setIsAdmin(false);
         }
-      } else {
-        setIsAdmin(false);
+      } catch (error) {
+        console.error("Auth state change error:", error);
+      } finally {
+        setUser(user);
+        setLoading(false);
       }
-      setUser(user);
-      setLoading(false);
     });
 
     return () => unsubscribe();

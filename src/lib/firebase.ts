@@ -28,8 +28,13 @@ export async function loginWithGoogle() {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     return result.user;
-  } catch (error) {
-    console.error("Login failed:", error);
+  } catch (error: any) {
+    console.error("Login failed (Firebase):", error.code, error.message);
+    if (error.code === 'auth/popup-blocked') {
+      alert('로그인 팝업이 차단되었습니다. 브라우저 설정에서 팝업을 허용해 주세요.');
+    } else if (error.code === 'auth/operation-not-allowed') {
+      console.error("Firebase Console에서 Google 로그인이 활성화되어 있는지 확인하세요.");
+    }
     throw error;
   }
 }
