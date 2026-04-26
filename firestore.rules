@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Connection test path (CRITICAL for app boot)
+    match /test/connection {
+      allow read: if true;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      // Check if user UID exists in admins collection
+      return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && (request.auth.uid == userId || isAdmin());
+    }
+
+    // --- Admins ---
+    match /admins/{adminId} {
+      allow read: if isSignedIn() && (request.auth.uid == adminId || isAdmin());
+      // Manageable via Firebase Console
+    }
+
+    // --- Users ---
+    match /users/{userId} {
+      allow list: if isAdmin();
+      allow get: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidUser(request.resource.data);
+      
+      function isValidUser(data) {
+        return data.keys().hasAll(['email', 'updatedAt'])
+               && data.email is string && data.email.size() <= 256
+               && (data.displayName == null || (data.displayName is string && data.displayName.size() <= 128))
+               && (data.photoURL == null || (data.photoURL is string && data.photoURL.size() <= 1024));
+      }
+    }
+
+    // --- Chats ---
+    match /chats/{chatId} {
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+
+      // --- Messages ---
+      match /messages/{messageId} {
+        function getChatOwner() {
+          return get(/databases/$(database)/documents/chats/$(chatId)).data.userId;
+        }
+
+        allow list, get: if isSignedIn() && (getChatOwner() == request.auth.uid || isAdmin());
+        allow create: if isSignedIn() && getChatOwner() == request.auth.uid;
+      }
+    }
+  }
+}
