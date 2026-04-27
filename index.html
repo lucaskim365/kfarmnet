@@ -1,9 +1,18 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
+    <title>kfarmnet - 스마트 농업 비서</title>
+    <script>
+      (function() {
+        var userAgent = navigator.userAgent.toLowerCase();
+        var targetUrl = window.location.href;
+        if (userAgent.indexOf('kakaotalk') > -1) {
+          location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(targetUrl);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
