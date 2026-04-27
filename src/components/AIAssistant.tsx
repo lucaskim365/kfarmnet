@@ -175,7 +175,7 @@ export default function AIAssistant() {
   };
 
   return (
-    <div className="bg-surface min-h-screen flex flex-col pt-32 pb-[240px] relative overflow-x-hidden">
+    <div className="bg-surface min-h-screen flex flex-col pt-20 pb-[240px] relative overflow-x-hidden">
       {/* Sidebar Overlay */}
       <AnimatePresence>
         {showHistory && (

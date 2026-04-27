@@ -39,7 +39,7 @@ export default function App() {
         onAdminClick={() => setPage("admin")}
       />
       
-      <main className="flex-grow">
+      <main className="flex-grow pt-16">
         {page === "home" ? (
           <>
             <Hero onSearch={() => setPage("ai")} />
