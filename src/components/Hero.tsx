@@ -21,7 +21,7 @@ export default function Hero({ onSearch }: { onSearch: () => void }) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="text-5xl md:text-6xl font-black text-white mb-8 drop-shadow-lg tracking-tight leading-tight"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 sm:mb-8 drop-shadow-lg tracking-tight leading-tight px-4"
         >
           농업의 미래를 질문하세요,<br />
           스마트 AI 비서 <span className="text-primary-fixed">kfarmnet</span>
@@ -31,23 +31,23 @@ export default function Hero({ onSearch }: { onSearch: () => void }) {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.8 }}
-          className="glass-panel p-2 rounded-full shadow-2xl flex items-center border border-white/30 max-w-2xl mx-auto"
+          className="glass-panel p-1.5 sm:p-2 rounded-full shadow-2xl flex items-center border border-white/30 max-w-2xl mx-auto w-full"
         >
-          <div className="ml-6 p-2 bg-primary/10 rounded-full">
+          <div className="ml-2 sm:ml-6 p-2 bg-primary/10 rounded-full hidden sm:block">
             <Sparkles className="w-5 h-5 text-primary fill-primary/20" />
           </div>
           <input 
             type="text" 
-            className="flex-1 bg-transparent border-none focus:ring-0 px-4 py-4 text-on-surface text-lg placeholder:text-slate-400 font-medium" 
+            className="flex-1 bg-transparent border-none focus:ring-0 px-4 sm:px-4 py-3 sm:py-4 text-on-surface text-sm sm:text-lg placeholder:text-slate-400 font-medium min-w-0" 
             placeholder="작물 생육 상태에 대해 물어보세요..." 
             onKeyDown={(e) => e.key === 'Enter' && onSearch()}
           />
           <button 
             onClick={onSearch}
-            className="bg-primary text-white rounded-full px-8 py-4 font-bold hover:bg-primary-container transition-all active:scale-95 flex items-center gap-2 shadow-lg"
+            className="bg-primary text-white rounded-full px-5 sm:px-8 py-3 sm:py-4 font-bold hover:bg-primary-container transition-all active:scale-95 flex items-center gap-1 sm:gap-2 shadow-lg text-sm sm:text-base whitespace-nowrap shrink-0"
           >
             <span>검색</span>
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </motion.div>
 
@@ -55,12 +55,12 @@ export default function Hero({ onSearch }: { onSearch: () => void }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
-          className="mt-8 flex flex-wrap justify-center gap-3"
+          className="mt-6 sm:mt-8 flex flex-wrap justify-center gap-2 sm:gap-3 px-2"
         >
           {["#토마토_생육", "#병해충_방제", "#시장_가격_동향"].map((tag) => (
             <span 
               key={tag} 
-              className="px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white text-xs font-semibold border border-white/10 hover:bg-white/30 cursor-pointer transition-colors"
+              className="px-3 sm:px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white text-xs font-semibold border border-white/10 hover:bg-white/30 cursor-pointer transition-colors"
             >
               {tag}
             </span>

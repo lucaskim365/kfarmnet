@@ -1,5 +1,6 @@
-import { motion } from "motion/react";
-import { Search, Bell, User, Menu, LogOut, LogIn, ShieldAlert } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Search, Bell, User, Menu, LogOut, LogIn, ShieldAlert, X } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Navbar({ onHomeClick, onSearchClick, onAIClick, onAdminClick }: { 
@@ -9,6 +10,7 @@ export default function Navbar({ onHomeClick, onSearchClick, onAIClick, onAdminC
   onAdminClick: () => void
 }) {
   const { user, login, logout, loading, isAdmin } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <header className="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md border-b border-white/20 shadow-sm">
@@ -104,11 +106,62 @@ export default function Navbar({ onHomeClick, onSearchClick, onAIClick, onAdminC
             )}
           </div>
           
-          <button className="md:hidden p-2 hover:bg-surface-container rounded-full">
-            <Menu className="w-6 h-6 text-on-surface" />
+          <button 
+            className="md:hidden p-2 hover:bg-surface-container rounded-full transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6 text-on-surface" />
+            ) : (
+              <Menu className="w-6 h-6 text-on-surface" />
+            )}
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="md:hidden bg-white border-b border-outline-variant overflow-hidden"
+          >
+            <div className="px-6 py-4 flex flex-col gap-4">
+              {[
+                { label: "AI 상담", action: onAIClick },
+                { label: "교육", action: onHomeClick },
+                { label: "내 농장", action: onHomeClick },
+                { label: "마켓플레이스", action: onHomeClick }
+              ].map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => {
+                    item.action();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left text-on-surface font-medium py-2 border-b border-slate-100 last:border-none hover:text-primary transition-colors"
+                >
+                  {item.label}
+                </button>
+              ))}
+              {isAdmin && (
+                <button
+                  onClick={() => {
+                    onAdminClick();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left text-red-500 font-bold py-2 flex items-center gap-2 hover:text-red-600 transition-colors"
+                >
+                  <ShieldAlert className="w-4 h-4" />
+                  Admin
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

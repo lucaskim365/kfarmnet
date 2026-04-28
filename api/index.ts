@@ -54,11 +54,19 @@ app.post("/api/chat", async (req, res) => {
       };
     });
 
+    const currentDate = new Date().toLocaleDateString("ko-KR", { 
+      year: "numeric", 
+      month: "long", 
+      day: "numeric", 
+      weekday: "long",
+      timeZone: "Asia/Seoul"
+    });
+
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents,
       config: {
-        systemInstruction: "당신은 스마트 농업 비서 kfarmnet입니다. 농민들에게 친절하고 전문적인 조언을 제공합니다. 답변은 한국어로 작성하며, 실질적인 도움이 되는 구체적인 정보를 제공하세요."
+        systemInstruction: `당신은 스마트 농업 비서 kfarmnet입니다. 농민들에게 친절하고 전문적인 조언을 제공합니다. 답변은 한국어로 작성하며, 실질적인 도움이 되는 구체적인 정보를 제공하세요.\n\n현재 날짜: ${currentDate}`
       }
     });
 

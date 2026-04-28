@@ -56,7 +56,7 @@ export default function App() {
         )}
       </main>
       
-      <Footer />
+      {page !== "ai" && <Footer />}
     </div>
   );
 }

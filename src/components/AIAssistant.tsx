@@ -43,7 +43,10 @@ export default function AIAssistant() {
 
   const scrollToBottom = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+      // 입력창(floating input)이 가리지 않도록 하단에서 240px 여백을 두고 스크롤합니다.
+      const elementY = scrollRef.current.getBoundingClientRect().top + window.scrollY;
+      const targetY = elementY - window.innerHeight + 240;
+      window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
     }
   };
 
