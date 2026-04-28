@@ -1,19 +1,40 @@
-import { motion } from "motion/react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { Sparkles, ArrowRight } from "lucide-react";
 
+const BACKGROUND_IMAGES = [
+  "https://images.unsplash.com/photo-1589923188900-85dae523342b?q=80&w=2500&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=2500&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2500&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1595800473216-562768565bfa?q=80&w=2500&auto=format&fit=crop"
+];
+
 export default function Hero({ onSearch }: { onSearch: () => void }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % BACKGROUND_IMAGES.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section className="relative h-[800px] flex items-center justify-center overflow-hidden pt-16">
-      <div className="absolute inset-0 z-0">
-        <motion.img 
-          initial={{ scale: 1.1, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          alt="Smart Farm" 
-          className="w-full h-full object-cover" 
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHqA4Ps9Tytar8OmTLTeKj6U8rcChqZTyKAJFCG6C7fS1waoBkKdIjZGPkluSwl41yrFFHPq8rs6Lj6lxsoXd9R6zJ-5aeKzCcYkSemRykjAYycaZw0wedPaT_8BRXlPJlEXCaC2JSQFLuzm06H34RIzXQoGtQx98Gjydo57Oqy9TylPzvT-nGjQlkL7N9JPmmPROcdRP1AxJdW8TK629cJ51gbXJWbKsvetnqpbdPJEsGxN7mdKAsJSXTtVV8gpPfmN6mbDpKDmNd" 
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-surface"></div>
+      <div className="absolute inset-0 z-0 bg-black">
+        <AnimatePresence>
+          <motion.img 
+            key={currentIndex}
+            initial={{ scale: 1.05, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            alt="Smart Farm" 
+            className="absolute inset-0 w-full h-full object-cover" 
+            src={BACKGROUND_IMAGES[currentIndex]} 
+          />
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-surface pointer-events-none"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-4xl px-8 text-center">
