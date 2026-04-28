@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
-import { Paperclip, Sparkles, Send, Microscope, TrendingUp, Bug, Cloud, User, Loader2, X, History, Plus, MessageSquare } from "lucide-react";
+import { Paperclip, Sparkles, Send, Microscope, TrendingUp, Bug, Cloud, User, Loader2, X, History, Plus, MessageSquare, Camera } from "lucide-react";
 import { useState, useRef, useEffect, ChangeEvent } from "react";
 import { chatWithGemini } from "../lib/gemini";
 import { useAuth } from "../contexts/AuthContext";
@@ -40,6 +40,7 @@ export default function AIAssistant() {
   const [showHistory, setShowHistory] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     if (scrollRef.current) {
@@ -92,19 +93,56 @@ export default function AIAssistant() {
     setShowHistory(false);
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = (reader.result as string).split(",")[1];
-      setSelectedImage({
-        data: base64String,
-        mimeType: file.type
+    try {
+      const compressedImage = await new Promise<{ data: string; mimeType: string }>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target?.result as string;
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const MAX_WIDTH = 1024;
+            const MAX_HEIGHT = 1024;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > MAX_WIDTH) {
+                height *= MAX_WIDTH / width;
+                width = MAX_WIDTH;
+              }
+            } else {
+              if (height > MAX_HEIGHT) {
+                width *= MAX_HEIGHT / height;
+                height = MAX_HEIGHT;
+              }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx?.drawImage(img, 0, 0, width, height);
+            
+            // Compress to JPEG with 70% quality to significantly reduce size
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+            const base64String = dataUrl.split(",")[1];
+            resolve({ data: base64String, mimeType: "image/jpeg" });
+          };
+          img.onerror = (err) => reject(err);
+        };
+        reader.onerror = (err) => reject(err);
       });
-    };
-    reader.readAsDataURL(file);
+
+      setSelectedImage(compressedImage);
+    } catch (error) {
+      console.error("Image compression failed:", error);
+      alert("이미지 처리 중 오류가 발생했습니다.");
+    }
   };
 
   const handleSend = async (text: string) => {
@@ -423,11 +461,27 @@ export default function AIAssistant() {
               accept="image/*"
               className="hidden"
             />
+            <input 
+              type="file" 
+              ref={cameraInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+            />
+            <button 
+              onClick={() => cameraInputRef.current?.click()}
+              className="p-2 sm:p-3 hover:bg-slate-50 rounded-full transition-colors group/icon md:hidden"
+              title="카메라로 촬영"
+            >
+              <Camera className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400 group-hover/icon:text-primary transition-colors" />
+            </button>
             <button 
               onClick={() => fileInputRef.current?.click()}
-              className="p-3 hover:bg-slate-50 rounded-full transition-colors group/icon"
+              className="p-2 sm:p-3 hover:bg-slate-50 rounded-full transition-colors group/icon"
+              title="이미지 첨부"
             >
-              <Paperclip className="w-6 h-6 text-slate-400 group-hover/icon:text-primary transition-colors" />
+              <Paperclip className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400 group-hover/icon:text-primary transition-colors" />
             </button>
             <input 
               type="text" 
