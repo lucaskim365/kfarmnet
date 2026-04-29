@@ -286,7 +286,7 @@ export default function AIAssistant() {
       </AnimatePresence>
 
       {/* History Button */}
-      <div className="max-w-4xl mx-auto px-6 w-full flex justify-end mb-4">
+      <div className="max-w-3xl mx-auto px-6 w-full flex justify-end mb-4">
         {user && (
           <button 
             onClick={() => setShowHistory(true)}
@@ -298,7 +298,7 @@ export default function AIAssistant() {
         )}
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 w-full flex flex-col">
+      <div className="max-w-3xl mx-auto px-6 w-full flex flex-col">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center">
             {/* Header Icon */}
@@ -367,7 +367,7 @@ export default function AIAssistant() {
                     </div>
                   )}
                   <div 
-                    className={`max-w-[80%] rounded-2xl p-5 text-lg font-medium leading-relaxed shadow-sm border ${
+                    className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 text-base font-medium leading-relaxed shadow-sm border ${
                       msg.role === "user" 
                         ? "bg-primary text-white border-primary" 
                         : "bg-white text-on-surface border-slate-100"
@@ -489,7 +489,7 @@ export default function AIAssistant() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend(input)}
               placeholder={selectedImage ? "이미지에 대해 설명해 주세요..." : "농업 관련 질문이나 이미지를 입력하세요..."}
-              className="flex-1 bg-transparent border-none focus:ring-0 text-lg font-medium text-on-surface placeholder:text-slate-300"
+              className="flex-1 bg-transparent border-none focus:ring-0 text-base font-medium text-on-surface placeholder:text-slate-300"
             />
             <div className="flex items-center gap-1 pr-1">
               <button className="p-3 hover:bg-slate-50 rounded-full transition-colors">
